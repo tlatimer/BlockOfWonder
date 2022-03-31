@@ -5,6 +5,7 @@ import pygame as pg
 from pygame.sprite import Sprite, Group
 
 import settings as s
+from move_deltas import get_neighbors, deltas
 
 
 class BlockOfWonder:
@@ -82,15 +83,16 @@ class Grid:
             cur_tile = to_visit.get()
             to_visit.task_done()  # needed for queue stuff
             visited.add(cur_tile)
+
             if cur_tile == dest_tile:
                 break
 
-            for delta in self._get_deltas(cur_tile.pos):
-                new_pos = self._add_pos(cur_tile.pos, delta)
-                if new_pos in self.tile_dict:
-                    new_tile = self.tile_dict[new_pos]
+            for path_node in get_neighbors(cur_tile.pos):
+                if path_node[0] in self.tile_dict:
+                    new_tile = self.tile_dict[path_node[0]]
                     if not new_tile.pf_parent and new_tile.is_walkable and new_tile not in visited:
                         new_tile.pf_parent = cur_tile
+                        new_tile.pf_delta = path_node[1]
                         to_visit.put(new_tile)
 
         path = []
@@ -101,16 +103,16 @@ class Grid:
         path.reverse()
         return path
 
-    def _add_pos(self, pos, delta):
-        x1, y1 = pos
-        x2, y2 = delta
-        return x1 + x2, y1 + y2
-
-    def _get_deltas(self, pos):
-        if sum(pos) % 2:
-            return s.deltas_cardinal + s.deltas_diagonal
-        else:
-            return s.deltas_cardinal[::-1] + s.deltas_diagonal[::-1]
+    # def _add_pos(self, pos, delta):
+    #     x1, y1 = pos
+    #     x2, y2 = delta
+    #     return x1 + x2, y1 + y2
+    #
+    # def _get_deltas(self, pos):
+    #     if sum(pos) % 2:
+    #         return s.deltas_cardinal + s.deltas_diagonal
+    #     else:
+    #         return s.deltas_cardinal[::-1] + s.deltas_diagonal[::-1]
 
     def get_random_tile(self):
         return choice(self.tiles_walkable.sprites())
@@ -128,6 +130,7 @@ class Tile(Sprite):
 
         # pathfinding variables
         self.pf_parent = None
+        self.pf_delta = 0
         self.is_walkable = True
 
         self.parent_building = None
@@ -246,7 +249,7 @@ class ItemList:
         pass
 
     def multiply(self, num):
-        """note that this returns multiplied, but doesn't affect the itemlist itself"""
+        """note that this returns multiplied, but doesn't affect the item_list itself"""
         pass
 
 
@@ -275,4 +278,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
