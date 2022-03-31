@@ -231,7 +231,7 @@ class Unit(Sprite):
         self.image = pg.Surface((ur * 2, ur * 2))
         pg.draw.circle(self.image, self.color, (ur, ur), ur)
 
-    def update(self, tick_ms):
+    def update(self, tick_ms=0):
         if self.path:
             self.ticks_passed += tick_ms
             self.cur_tile = self.path.pop(0)
