@@ -7,13 +7,18 @@ deltas = ({'name': 'L', 'dx': -1, 'dy': 0, 'dist': 2, 'rot': 0, },
           {'name': 'UR', 'dx': 1, 'dy': -1, 'dist': 3, 'rot': 45, },
           {'name': 'DL', 'dx': -1, 'dy': 1, 'dist': 3, 'rot': 225, })
 
+# deltas itself needs to be ordered, but we also want to retrieve by key. I can spare the RAM.
+delta_map = {}
+for delta in deltas:
+    delta_map[delta['name']] = delta
+
 
 def get_neighbors(tile_pos):
     to_return = []  # [((new_x, new_y), delta_index),]
     x, y = tile_pos
-    for i in range(8):
+    for d in deltas:
         to_return.append((
-            (x + deltas[i]['dx'], y + deltas[i]['dy']), i
+            (x + d['dx'], y + d['dy']), d['name']
         ))
     if x + y % 2:
         return to_return
@@ -21,14 +26,12 @@ def get_neighbors(tile_pos):
         return flip_order(to_return)
 
 
-def flip_order(list):
-    temp = list[:4]
+def flip_order(this_list):
+    # https://www.redblobgames.com/pathfinding/a-star/implementation.html#troubleshooting-ugly-path
+    temp = this_list[:4]
     temp.reverse()
     flip_list = temp
 
-    temp = list[4:]
+    temp = this_list[4:]
     temp.reverse()
     return flip_list + temp
-
-
-print(get_neighbors((2, 2)))

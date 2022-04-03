@@ -11,7 +11,7 @@ border_size = 2
 default_border_color = 'gray20'
 
 unit_radius = int(tile_size / 6)
-unit_speed = 1000  # ms per tile
+unit_speed = 1000  # ms per 1/2 tile
 
 # tasks are done in priorities from first to last
 unit_task_types = ['input', 'output']
